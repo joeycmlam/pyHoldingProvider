@@ -39,13 +39,3 @@ class dbConnection():
         self.conn.close()
 
 
-def main():
-    print ('test')
-    db = dbConnection()
-    holdings = db.execSQL('select stock_code, quantity, bookcost from holding')
-    for aHolding in holdings:
-        print(aHolding)
-    db.disconnect()
-
-if __name__ == '__main__':
-    main()

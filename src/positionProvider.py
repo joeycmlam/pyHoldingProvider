@@ -47,15 +47,15 @@ class Position:
     def getMV(self):
         return self.mv
 
-    def getHoldingJosn(self, lstHolding):
-        result = json.dumps(lstHolding, cls=CustomJsonEncoder)
+    def getHoldingJosn(self):
+        result = json.dumps(self.holdings, cls=CustomJsonEncoder)
         return result
 
 def main():
     try:
         p = Position()
         result = p.getHolding()
-        print(p.getHoldingJosn(result))
+        print(p.getHoldingJosn())
     except (Exception) as err:
         sys.exit(err)
 
