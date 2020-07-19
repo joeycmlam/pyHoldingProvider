@@ -1,4 +1,14 @@
 import pgConnection
+import holding
+import json
+from decimal import Decimal
+import sys
+
+
+def default(obj):
+    if isinstance(obj, Decimal):
+        return str(obj)
+    raise TypeError("Object of type '%s' is not JSON serializable" % type(obj).__name__)
 
 class Position:
 
@@ -7,25 +17,41 @@ class Position:
     db = None
 
     def __init__(self):
-        print ('init')
         self.db = pgConnection.dbConnection()
 
     def loadHolding(self):
-        self.holdings = self.db.execSQL('select stock_code, quantity, bookcost from holding')
+        result = self.db.execSQL('select stock_code, quantity, bookcost from holding')
+        return result
 
     def getHolding(self):
-        self.loadHolding()
+        try:
+            self.holdings = []
+            dbResult = self.loadHolding()
+            for aRecord in dbResult:
+                h = holding.Holding(stock_code=aRecord[0], quantity=aRecord[1], bookcost=aRecord[2])
+                print(h)
+                self.holdings.append(h)
+        except (Exception) as err:
+            print(err)
+            self.holdings = None
+
         return self.holdings
 
     def getMV(self):
         return self.mv
 
+    def getHoldingJosn(self, lstHolding):
+        result = json.dumps(lstHolding)
+
+
 def main():
-    print('test')
-    p = Position()
-    holdings = p.getHolding()
-    for aRecord in holdings:
-        print(aRecord)
+    try:
+        p = Position()
+        result = p.getHolding()
+        print(p.getHoldingJosn(result))
+    except (Exception) as err:
+        sys.exit(err)
+
 
 if __name__ == '__main__':
     main()

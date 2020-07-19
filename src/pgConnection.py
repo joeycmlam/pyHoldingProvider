@@ -1,15 +1,25 @@
 import psycopg2
+import yaml
 
 class dbConnection():
     conn = None
-    dsn = ''
+    dbname = ''
+    dbuser = ''
+    dbpassword = ''
+    config_file = '../resource/config.yaml'
+    config = None
 
     def __init__(self):
         self.conn = None
 
         try:
-            self.dns = 'dbname=mydb user=postgres password=xxxx'
-            self.conn = psycopg2.connect(dsn=self.dns)
+            config = open(self.config_file)
+            parsed_yaml_file = yaml.load(config, Loader=yaml.FullLoader)
+            self.dbname = parsed_yaml_file['database']['postgre']['dbname']
+            self.dbuser = parsed_yaml_file['database']['postgre']['user']
+            self.dbpassword = parsed_yaml_file['database']['postgre']['password']
+            dnsinfo = 'dbname=' + self.dbname + ' user=' + self.dbuser + ' password=' + self.dbpassword
+            self.conn = psycopg2.connect(dsn= dnsinfo)
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
 

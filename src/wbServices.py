@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 import positionProvider
 import json
 from decimal import Decimal
+import jsonify
 
 def default(obj):
     if isinstance(obj, Decimal):
@@ -20,7 +21,8 @@ class api_holding(Resource):
         try:
             p = positionProvider.Position()
             h = p.getHolding()
-            result = json.dumps(h, default=default)
+            #result = json.dumps(h, default=default)
+            result = h
         except (Exception) as err:
             print(err)
 
