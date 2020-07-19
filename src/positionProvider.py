@@ -1,17 +1,20 @@
+import pgConnection
+
 class Position:
 
-    holdings = ''
+    holdings = None
     mv = 0
+    db = None
 
     def __init__(self):
         print ('init')
-        self.loadHolding()
-        self.mv = 1000
+        self.db = pgConnection.dbConnection()
 
     def loadHolding(self):
-        self.holdings = 'xxx'
+        self.holdings = self.db.execSQL('select stock_code, quantity, bookcost from holding')
 
     def getHolding(self):
+        self.loadHolding()
         return self.holdings
 
     def getMV(self):
@@ -20,7 +23,9 @@ class Position:
 def main():
     print('test')
     p = Position()
-    print('MV', p.getMV())
+    holdings = p.getHolding()
+    for aRecord in holdings:
+        print(aRecord)
 
 if __name__ == '__main__':
     main()
