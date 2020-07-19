@@ -1,16 +1,25 @@
 import psycopg2
 
-def getHolding():
-    conn = psycopg2.connect("dbname=mydb user=postgres password=xxxxx")
-    cur = conn.cursor()
-    cur.execute('select stock_code, quantity, bookcost from holding')
-    holdings = cur.fetchall()
+class dbConnection():
+    conn = None
 
-    for row in holdings:
-        print('stock code = ', row[0])
-        print('quantity = ', row[1])
-        print('bookcost = ', row[2])
+    def connectDb(self, dsn_info):
+        self.conn = psycopg2.connect(dsn=dsn_info)
+
+
+    def execSQL(self, sql):
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+
+def main():
+    print ('test')
+    db = dbConnection()
+    db.connectDb("dbname=mydb user=postgres password=xxxx")
+    holdings = db.execSQL('select stock_code, quantity, bookcost from holding')
+    for aHolding in holdings:
+        print(aHolding)
 
 if __name__ == '__main__':
-
-    getHolding()
+    main()
