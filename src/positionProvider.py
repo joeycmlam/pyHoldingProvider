@@ -1,14 +1,21 @@
 import pgConnection
-import holding
 import json
-from decimal import Decimal
 import sys
+from decimal import Decimal
 
+class CustomJsonEncoder(json.JSONEncoder):
 
-def default(obj):
-    if isinstance(obj, Decimal):
-        return str(obj)
-    raise TypeError("Object of type '%s' is not JSON serializable" % type(obj).__name__)
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super(CustomJsonEncoder, self).default(obj)
+
+class Holding:
+    def __init__(self, stock_code, quantity, bookcost):
+        self.stock_code = stock_code
+        self.quantity = 0
+        self.bookcost = 0
+
 
 class Position:
 
@@ -28,9 +35,9 @@ class Position:
             self.holdings = []
             dbResult = self.loadHolding()
             for aRecord in dbResult:
-                h = holding.Holding(stock_code=aRecord[0], quantity=aRecord[1], bookcost=aRecord[2])
-                print(h)
-                self.holdings.append(h)
+                #h = Holding(stock_code=aRecord[0], quantity=aRecord[1], bookcost=aRecord[2])
+                jsonStr = json.dumps(aRecord, cls=CustomJsonEncoder)
+                self.holdings.append(aRecord)
         except (Exception) as err:
             print(err)
             self.holdings = None
@@ -41,8 +48,8 @@ class Position:
         return self.mv
 
     def getHoldingJosn(self, lstHolding):
-        result = json.dumps(lstHolding)
-
+        result = json.dumps(lstHolding, cls=CustomJsonEncoder)
+        return result
 
 def main():
     try:
